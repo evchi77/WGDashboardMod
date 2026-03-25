@@ -13,6 +13,7 @@ import PeerListModals from "@/components/configurationComponents/peerListCompone
 import PeerIntersectionObserver from "@/components/configurationComponents/peerIntersectionObserver.vue";
 import ConfigurationDescription from "@/components/configurationComponents/configurationDescription.vue";
 import PeerDetailsModal from "@/components/configurationComponents/peerDetailsModal.vue";
+import ConfigurationToggleConfirm from "@/components/configurationComponents/configurationToggleConfirm.vue";
 import {parseCidr} from "cidr-tools";
 
 // Async Components
@@ -29,6 +30,7 @@ const route = useRoute()
 const configurationInfo = ref({})
 const configurationPeers = ref([])
 const configurationToggling = ref(false)
+const confirmToggleOpen = ref(false)
 const configurationModalSelectedPeer = ref({})
 const configurationModals = ref({
 	peerNew: {
@@ -140,6 +142,25 @@ const toggleConfiguration = async () => {
 		configurationInfo.value.Status = res.data
 		configurationToggling.value = false;
 	})
+}
+
+const requestToggleConfiguration = (event) => {
+	if (event){
+		event.preventDefault();
+	}
+	if (configurationToggling.value || !configurationInfo.value?.Name){
+		return;
+	}
+	if (configurationInfo.value.Status){
+		confirmToggleOpen.value = true;
+		return;
+	}
+	toggleConfiguration()
+}
+
+const confirmToggleConfiguration = () => {
+	confirmToggleOpen.value = false;
+	toggleConfiguration()
 }
 
 // Configuration Summary =====================================
@@ -280,8 +301,8 @@ watch(() => route.query.id, (newValue) => {
 						       style="cursor: pointer"
 						       :disabled="configurationToggling"
 						       type="checkbox" role="switch" :id="'switch' + configurationInfo.id"
-						       @change="toggleConfiguration()"
-						       v-model="configurationInfo.Status">
+						       @click="requestToggleConfiguration"
+						       :checked="configurationInfo.Status">
 					</div>
 				</div>
 			</div>
@@ -495,6 +516,14 @@ watch(() => route.query.id, (newValue) => {
 		:showPeersCount="showPeersCount"
 		:peerListLength="searchPeers.length"
 		@loadMore="showPeersCount += showPeersThreshold"></PeerIntersectionObserver>
+	<Transition name="zoom">
+		<ConfigurationToggleConfirm
+			v-if="confirmToggleOpen"
+			:configurationName="configurationInfo.Name"
+			@confirm="confirmToggleConfiguration"
+			@close="confirmToggleOpen = false"
+		></ConfigurationToggleConfirm>
+	</Transition>
 </div>
 </template>
 

@@ -3,10 +3,11 @@ import {fetchGet} from "@/utilities/fetch.js";
 import {DashboardConfigurationStore} from "@/stores/DashboardConfigurationStore.js";
 import LocaleText from "@/components/text/localeText.vue";
 import ProtocolBadge from "@/components/protocolBadge.vue";
+import ConfigurationToggleConfirm from "@/components/configurationComponents/configurationToggleConfirm.vue";
 
 export default {
 	name: "configurationCard",
-	components: {ProtocolBadge, LocaleText},
+	components: {ConfigurationToggleConfirm, ProtocolBadge, LocaleText},
 	props: {
 		c: {
 			Name: String,
@@ -19,7 +20,9 @@ export default {
 	},
 	data(){
 		return{
-			configurationToggling: false
+			configurationToggling: false,
+			pendingToggleTarget: undefined,
+			confirmToggleOpen: false
 		}
 	},
 	setup(){
@@ -27,8 +30,26 @@ export default {
 		return {dashboardConfigurationStore}
 	},
 	methods: {
+		requestToggle(event){
+			if (event){
+				event.preventDefault();
+			}
+			if (this.configurationToggling){
+				return;
+			}
+			if (this.c.Status){
+				this.confirmToggleOpen = true;
+				return;
+			}
+			this.toggle();
+		},
+		confirmToggle(){
+			this.confirmToggleOpen = false;
+			this.toggle();
+		},
 		toggle(){
 			this.configurationToggling = true;
+			this.pendingToggleTarget = !this.c.Status;
 			fetchGet("/api/toggleWireguardConfiguration", {
 				configurationName: this.c.Name
 			}, (res) => {
@@ -41,6 +62,7 @@ export default {
 				}
 				this.c.Status = res.data
 				this.configurationToggling = false;
+				this.pendingToggleTarget = undefined;
 			})
 		}
 	}
@@ -98,8 +120,8 @@ export default {
 					</div>
 					<div class="form-check form-switch ms-auto">
 						<label class="form-check-label" style="cursor: pointer" :for="'switch' + c.PrivateKey">
-							<LocaleText t="Turning Off..." v-if="!c.Status && this.configurationToggling"></LocaleText>
-							<LocaleText t="Turning On..." v-else-if="c.Status && this.configurationToggling"></LocaleText>
+							<LocaleText t="Turning Off..." v-if="this.configurationToggling && this.pendingToggleTarget === false"></LocaleText>
+							<LocaleText t="Turning On..." v-else-if="this.configurationToggling && this.pendingToggleTarget === true"></LocaleText>
 							<LocaleText t="On" v-else-if="c.Status && !this.configurationToggling"></LocaleText>
 							<LocaleText t="Off" v-else-if="!c.Status && !this.configurationToggling"></LocaleText>
 
@@ -111,13 +133,21 @@ export default {
 						       style="cursor: pointer"
 						       :disabled="this.configurationToggling"
 						       type="checkbox" role="switch" :id="'switch' + c.PrivateKey"
-						       @change="this.toggle()"
-						       v-model="c.Status"
+						       @click="requestToggle"
+						       :checked="c.Status"
 						>
 					</div>
 				</div>
 			</div>
 		</div>
+		<Transition name="zoom">
+			<ConfigurationToggleConfirm
+				v-if="confirmToggleOpen"
+				:configurationName="c.Name"
+				@confirm="confirmToggle"
+				@close="confirmToggleOpen = false"
+			></ConfigurationToggleConfirm>
+		</Transition>
 	</div>
 </template>
 

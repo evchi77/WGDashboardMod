@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:src/static/dist/WGDashboardAdmin/assets/configuration-CzDtxzas.js
-import{_ as r,c as i,b as o,w as e,k as l,j as a,l as _,S as u,h as d,f as t}from"./index-B0nJjBHB.js";const m={name:"configuration"},f={class:"mt-md-5 mt-3 text-body"};function p(h,k,x,w,$,v){const n=d("RouterView");return t(),i("div",f,[o(n,null,{default:e(({Component:s,route:c})=>[o(l,{name:"fade2",mode:"out-in"},{default:e(()=>[(t(),a(u,null,{default:e(()=>[(t(),a(_(s),{key:c.path,class:"z-1"}))]),_:2},1024))]),_:2},1024)]),_:1})])}const B=r(m,[["render",p]]);export{B as default};
-========
-import{_ as r,c as i,b as o,w as e,k as l,j as a,l as _,S as u,h as d,f as t}from"./index-CmClDcBF.js";const m={name:"configuration"},f={class:"mt-md-5 mt-3 text-body"};function p(h,k,x,w,$,v){const n=d("RouterView");return t(),i("div",f,[o(n,null,{default:e(({Component:s,route:c})=>[o(l,{name:"fade2",mode:"out-in"},{default:e(()=>[(t(),a(u,null,{default:e(()=>[(t(),a(_(s),{key:c.path,class:"z-1"}))]),_:2},1024))]),_:2},1024)]),_:1})])}const B=r(m,[["render",p]]);export{B as default};
->>>>>>>> upstream/main:src/static/dist/WGDashboardAdmin/assets/configuration-BTQ9biUJ.js
